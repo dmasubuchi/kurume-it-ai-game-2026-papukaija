@@ -19,30 +19,16 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from src.outgame.menu import OutGameMenu
 from src.outgame.save_manager import SlotName
+from src.ingame.runner import run_game
 
 
 def on_play(slot: SlotName, slot_path: Path) -> None:
     """
     ゲーム開始時のコールバック
 
-    ここでInGameを起動する。
-    現在はプレースホルダー実装。
+    SAVEディレクトリ内のingame/game.pyを実行します。
     """
-    print(f"\n=== SAVE_{slot} を読み込みました ===")
-    print(f"Path: {slot_path}")
-    print()
-    print("InGame はまだ実装されていません。")
-    print("examples/ の各ステップを試してみてください：")
-    print()
-    print("  python examples/step_00_hello/main.py")
-    print("  python examples/step_01_game_loop/main.py")
-    print("  python examples/step_02_state/main.py")
-    print("  python examples/step_03_io/main.py")
-    print("  python examples/step_04_renderer/main.py")
-    print("  python examples/step_05_lexer/main.py")
-    print("  python examples/step_06_parser/main.py")
-    print()
-    input("Press Enter to return to menu...")
+    run_game(slot_path)
 
 
 def main() -> None:

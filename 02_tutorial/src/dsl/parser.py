@@ -356,6 +356,8 @@ class Parser:
         name = ""
         if self.check(TokenType.STRING):
             name = self.advance().value
+        elif self.check(TokenType.IDENTIFIER):
+            name = self.advance().value
 
         return SpawnCommand(entity_type=entity_type, x=x, y=y, name=name)
 
