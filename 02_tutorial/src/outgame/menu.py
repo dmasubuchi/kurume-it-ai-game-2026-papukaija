@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Callable
 
 from src.outgame.save_manager import SaveManager, SlotName, SLOTS
+from src.outgame.stage_manager import StageManager, StageInfo
 from src.outgame.readme_viewer import display_readme
 
 
@@ -29,6 +30,7 @@ class OutGameMenu:
             base_path = Path(__file__).parent.parent.parent
         self.base_path = Path(base_path)
         self.save_manager = SaveManager(base_path)
+        self.stage_manager = StageManager(base_path)
         self.on_play = on_play
         self.running = True
 
@@ -51,7 +53,8 @@ class OutGameMenu:
             if not status.exists or not status.ready:
                 state = "[Empty]"
             else:
-                state = f"[Ready] Turn {status.turn}"
+                stage_name = status.loaded_stage or "default"
+                state = f"[{stage_name}] Turn {status.turn}"
             print(f"  {status.name}: {state}")
         print()
 
@@ -62,32 +65,145 @@ class OutGameMenu:
         self.show_slot_status()
 
         print("--- Menu ---")
-        print("  1) Continue A")
-        print("  2) Continue B")
-        print("  3) Continue C")
-        print("  4) Manage Saves")
-        print("  5) Readme")
-        print("  6) Quit")
+        print("  1) New Game")
+        print("  2) Continue A")
+        print("  3) Continue B")
+        print("  4) Continue C")
+        print("  5) Manage Saves")
+        print("  6) Readme")
+        print("  7) Quit")
         print()
 
-        return input("Select (1-6): ").strip()
+        return input("Select (1-7): ").strip()
 
     def handle_continue(self, slot: SlotName) -> None:
         """Continue処理"""
         if not self.save_manager.is_ready(slot):
             print(f"\nSAVE_{slot} is not ready.")
-            print("Use 'Manage Saves' -> 'setup' to initialize it first.")
+            print("Use 'New Game' to start a new game, or 'Manage Saves' to setup.")
             input("Press Enter to continue...")
             return
 
         slot_path = self.save_manager.get_slot_path(slot)
-        print(f"\nLoading SAVE_{slot}...")
+        status = self.save_manager.get_slot_status(slot)
+        stage_name = status.loaded_stage or "default"
+        print(f"\nLoading SAVE_{slot} [{stage_name}]...")
 
         if self.on_play:
             self.on_play(slot, slot_path)
         else:
             print("(No game handler registered)")
             input("Press Enter to continue...")
+
+    def handle_new_game(self) -> None:
+        """New Game フロー"""
+        # Step 1: Stage選択
+        stage = self.show_stage_selection()
+        if stage is None:
+            return
+
+        # Step 2: Slot選択
+        slot = self.show_slot_selection(stage)
+        if slot is None:
+            return
+
+        # Step 3: 確認と実行
+        status = self.save_manager.get_slot_status(slot)
+        if status.ready:
+            confirm = input(f"\nSAVE_{slot} will be overwritten. Continue? (y/N): ")
+            if confirm.lower() != "y":
+                print("Cancelled.")
+                input("Press Enter to continue...")
+                return
+            # 既存を削除
+            self.save_manager.delete(slot)
+
+        # Stage をロード
+        if self.save_manager.setup(slot, stage_id=stage.id):
+            print(f"\nSAVE_{slot} initialized with {stage.name}")
+            print("Starting game...")
+
+            slot_path = self.save_manager.get_slot_path(slot)
+            if self.on_play:
+                self.on_play(slot, slot_path)
+        else:
+            print("Failed to setup slot.")
+            input("Press Enter to continue...")
+
+    def show_stage_selection(self) -> StageInfo | None:
+        """Stage選択画面"""
+        stages = self.stage_manager.discover_stages()
+
+        if not stages:
+            print("\nNo stages available.")
+            print("Create stages in templates/stages/")
+            input("Press Enter to continue...")
+            return None
+
+        self.clear_screen()
+        self.show_header()
+
+        print("=== Select Stage ===")
+        print()
+        for i, stage in enumerate(stages, 1):
+            print(f"  {i}) {stage.name}")
+            if stage.description_ja:
+                print(f"     {stage.description_ja}")
+        print()
+        print("  0) Back")
+        print()
+
+        choice = input("Stage> ").strip()
+
+        if choice == "0" or not choice:
+            return None
+
+        try:
+            idx = int(choice) - 1
+            if 0 <= idx < len(stages):
+                return stages[idx]
+        except ValueError:
+            pass
+
+        print(f"Invalid selection: {choice}")
+        input("Press Enter to continue...")
+        return None
+
+    def show_slot_selection(self, stage: StageInfo) -> SlotName | None:
+        """Slot選択画面"""
+        self.clear_screen()
+        self.show_header()
+
+        print(f"=== {stage.name} ===")
+        if stage.description_ja:
+            print(f"{stage.description_ja}")
+        print()
+        print("Select Slot:")
+        print()
+
+        for slot in SLOTS:
+            status = self.save_manager.get_slot_status(slot)
+            if status.ready:
+                stage_name = status.loaded_stage or "default"
+                print(f"  {slot}) SAVE_{slot} [{stage_name}] Turn {status.turn} <- OVERWRITE")
+            else:
+                print(f"  {slot}) SAVE_{slot} [Empty]")
+
+        print()
+        print("  0) Back")
+        print()
+
+        choice = input("Slot> ").strip().upper()
+
+        if choice == "0" or not choice:
+            return None
+
+        if choice in SLOTS:
+            return choice  # type: ignore
+
+        print(f"Invalid selection: {choice}")
+        input("Press Enter to continue...")
+        return None
 
     def show_manage_menu(self) -> None:
         """Manage Savesメニュー"""
@@ -132,6 +248,8 @@ class OutGameMenu:
             print(f"\nSAVE_{status.name}:")
             print(f"  Exists: {status.exists}")
             print(f"  Ready: {status.ready}")
+            if status.loaded_stage:
+                print(f"  Stage: {status.loaded_stage}")
             if status.created_at:
                 print(f"  Created: {status.created_at}")
             if status.last_played:
@@ -224,16 +342,18 @@ class OutGameMenu:
             choice = self.show_main_menu()
 
             if choice == "1":
-                self.handle_continue("A")
+                self.handle_new_game()
             elif choice == "2":
-                self.handle_continue("B")
+                self.handle_continue("A")
             elif choice == "3":
-                self.handle_continue("C")
+                self.handle_continue("B")
             elif choice == "4":
-                self.show_manage_menu()
+                self.handle_continue("C")
             elif choice == "5":
-                display_readme(self.base_path)
+                self.show_manage_menu()
             elif choice == "6":
+                display_readme(self.base_path)
+            elif choice == "7":
                 self.running = False
                 print("\nGoodbye!")
             else:

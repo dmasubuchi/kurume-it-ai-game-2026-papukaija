@@ -1,0 +1,9 @@
+{
+  "id": "step_02",
+  "name": "Step 02: State Management",
+  "name_ja": "状態管理",
+  "description": "Learn immutable state management patterns",
+  "description_ja": "イミュータブルな状態管理パターンを学びます",
+  "commands": ["move player <x> <y>", "status", "help", "quit"],
+  "help_text": "move player 11 5 でプレイヤーを移動。状態は毎回新しく生成されます"
+}

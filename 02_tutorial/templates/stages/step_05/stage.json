@@ -1,0 +1,9 @@
+{
+  "id": "step_05",
+  "name": "Step 05: DSL Lexer",
+  "name_ja": "DSL字句解析",
+  "description": "Tokenize DSL commands",
+  "description_ja": "コマンド文字列をトークンに分解する仕組みを学びます",
+  "commands": ["move player <x> <y>", "spawn <type> <x> <y>", "destroy <target>", "status", "help", "quit"],
+  "help_text": "DSLコマンドがトークンに分解されて解釈されます"
+}

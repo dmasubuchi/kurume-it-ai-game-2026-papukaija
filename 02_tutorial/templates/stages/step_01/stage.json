@@ -1,0 +1,9 @@
+{
+  "id": "step_01",
+  "name": "Step 01: Game Loop",
+  "name_ja": "ゲームループの基礎",
+  "description": "Learn the basic turn-based game loop pattern",
+  "description_ja": "カウンターを増減させてゲームループを体験します",
+  "commands": ["up", "+", "down", "-", "reset", "help", "quit"],
+  "help_text": "up(+): カウンター+1, down(-): カウンター-1, reset: リセット, quit: 終了"
+}

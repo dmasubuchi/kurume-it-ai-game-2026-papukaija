@@ -1,0 +1,9 @@
+{
+  "id": "step_07",
+  "name": "Step 07: Interpreter",
+  "name_ja": "DSLインタプリタ",
+  "description": "Execute AST to modify game state",
+  "description_ja": "ASTを実行してゲーム状態を変更する仕組みを学びます",
+  "commands": ["move player <x> <y>", "spawn <type> <x> <y>", "destroy <target>", "set <entity>.<prop> <value>", "if <cond> then <action>", "wait", "status", "help", "quit"],
+  "help_text": "wait コマンドでAIターンを実行できます"
+}

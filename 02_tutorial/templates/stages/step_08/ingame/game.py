@@ -215,11 +215,8 @@ def execute_ai_turn(state: GameState, interpreter: Interpreter) -> GameState:
     return current_state.next_turn()
 
 
-def create_update(slot_path: Path, interpreter: Interpreter, meta: dict | None = None):
+def create_update(slot_path: Path, interpreter: Interpreter):
     """update関数を作成"""
-    meta = meta or {}
-    stage_commands = meta.get("stage_commands", [])
-    stage_help = meta.get("stage_help_text", "")
 
     def update(state: GameState, cmd: str) -> GameState:
         """コマンドを実行して新しい状態を返す"""
@@ -227,26 +224,16 @@ def create_update(slot_path: Path, interpreter: Interpreter, meta: dict | None =
 
         # 特殊コマンド
         if cmd == "help":
-            output("\n=== Commands ===")
-            # stage固有コマンドがあれば表示（status/save/quitは含まれている想定）
-            if stage_commands:
-                for cmd_text in stage_commands:
-                    output(f"  {cmd_text}")
-            else:
-                # デフォルトコマンド一覧
-                output("  move player <x> <y>  - Move player")
-                output("  spawn <type> <x> <y> - Spawn entity")
-                output("  destroy <target>     - Destroy entity")
-                output("  set <entity>.<prop> <value>")
-                output("  if <condition> then <action>")
-                output("  wait                 - AI turn")
-                output("  status               - Show status")
-                output("  save                 - Manual save")
-                output("  quit                 - Exit game")
-            # stage固有ヘルプがあれば表示
-            if stage_help:
-                output("")
-                output(stage_help)
+            output("\nAvailable commands:")
+            output("  move player <x> <y>  - Move player")
+            output("  spawn <type> <x> <y> - Spawn entity")
+            output("  destroy <target>     - Destroy entity")
+            output("  set <entity>.<prop> <value>")
+            output("  if <condition> then <action>")
+            output("  wait                 - AI turn")
+            output("  status               - Show status")
+            output("  save                 - Manual save")
+            output("  quit                 - Exit game")
             output("")
             return state
 
@@ -296,38 +283,13 @@ def create_update(slot_path: Path, interpreter: Interpreter, meta: dict | None =
     return update
 
 
-def load_meta(slot_path: Path) -> dict:
-    """meta.jsonを読み込み"""
-    meta_file = slot_path / "meta.json"
-    if meta_file.exists():
-        try:
-            return json.loads(meta_file.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            pass
-    return {}
-
-
 def run(slot_path: Path) -> None:
     """ゲームを実行"""
     slot_path = Path(slot_path)
 
-    # meta.jsonからStage情報を取得
-    meta = load_meta(slot_path)
-    stage_name = meta.get("stage_name") or meta.get("loaded_stage") or "Game"
-    stage_name_ja = meta.get("stage_name_ja", "")
-    stage_help = meta.get("stage_help_text", "")
-
     print()
-    print("=" * 50)
-    print(f"  {stage_name}")
-    if stage_name_ja:
-        print(f"  {stage_name_ja}")
-    print("=" * 50)
+    print(f"=== {config.GAME_TITLE} ===")
     print(f"SAVE: {slot_path.name}")
-    if stage_help:
-        print()
-        print(stage_help)
-    print()
     print("Type 'help' for commands, 'quit' to exit")
     print()
 
@@ -345,8 +307,8 @@ def run(slot_path: Path) -> None:
     # インタプリタ作成
     interpreter = Interpreter()
 
-    # update関数作成（meta情報を渡す）
-    update = create_update(slot_path, interpreter, meta)
+    # update関数作成
+    update = create_update(slot_path, interpreter)
 
     # ゲームループ実行
     def game_get_input() -> str:

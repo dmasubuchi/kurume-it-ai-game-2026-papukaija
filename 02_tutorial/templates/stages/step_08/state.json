@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "player": {
+    "name": "Player",
+    "x": 10,
+    "y": 10,
+    "hp": 100,
+    "max_hp": 100
+  },
+  "entities": [],
+  "turn": 0,
+  "score": 0,
+  "is_game_over": false
+}

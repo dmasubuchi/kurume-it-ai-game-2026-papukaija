@@ -1,0 +1,9 @@
+{
+  "id": "step_08",
+  "name": "Step 08: A* Pathfinding",
+  "name_ja": "A*経路探索（統合版）",
+  "description": "Full game with DSL interpreter and A* pathfinding AI",
+  "description_ja": "DSLコマンドとA*アルゴリズムを使った完全版ゲーム",
+  "commands": ["move player <x> <y>", "spawn <type> <x> <y>", "destroy <target>", "set <entity>.<prop> <value>", "wait", "status", "save", "help", "quit"],
+  "help_text": "move: 移動, spawn: 生成, destroy: 破壊, wait: AIターン, quit: 終了"
+}

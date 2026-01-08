@@ -31,6 +31,7 @@ class SlotStatus:
     created_at: str | None = None
     last_played: str | None = None
     turn: int = 0
+    loaded_stage: str | None = None  # ロードされたStage ID
 
 
 class SaveManager:
@@ -68,6 +69,7 @@ class SaveManager:
         created_at = None
         last_played = None
         turn = 0
+        loaded_stage = None
 
         if meta_path.exists():
             try:
@@ -75,6 +77,7 @@ class SaveManager:
                 created_at = meta.get("created_at")
                 last_played = meta.get("last_played")
                 turn = meta.get("turn", 0)
+                loaded_stage = meta.get("loaded_stage")
             except (json.JSONDecodeError, KeyError):
                 pass
 
@@ -85,15 +88,25 @@ class SaveManager:
             created_at=created_at,
             last_played=last_played,
             turn=turn,
+            loaded_stage=loaded_stage,
         )
 
     def status(self) -> list[SlotStatus]:
         """全スロットの状態を取得"""
         return [self.get_slot_status(slot) for slot in SLOTS]
 
-    def setup(self, slot: SlotName) -> bool:
+    def setup(self, slot: SlotName, stage_id: str | None = None) -> bool:
         """
         スロットをテンプレートから初期化
+
+        Args:
+            slot: スロット名
+            stage_id: Stage ID（例: "step_01"）。指定時はStageテンプレートを使用。
+
+        設計方針:
+            1. まず ingame_default をベースとしてコピー（game.py含む核心部分）
+            2. Stage固有ファイル（state.json, ingame/config.py等）で上書き
+            3. game.py は ingame_default のものを必ず使用（Stageは上書き不可）
 
         Returns:
             成功したらTrue
@@ -107,41 +120,88 @@ class SaveManager:
         # ディレクトリ作成
         slot_path.mkdir(parents=True, exist_ok=True)
 
-        # テンプレートからコピー
-        ingame_template = self.templates_path / "ingame_default"
-        if ingame_template.exists():
-            ingame_dest = slot_path / "ingame"
-            shutil.copytree(ingame_template, ingame_dest)
+        # Step 1: ingame_default をベースとしてコピー（核心部分）
+        ingame_default = self.templates_path / "ingame_default"
+        ingame_dest = slot_path / "ingame"
+        if ingame_default.exists():
+            shutil.copytree(ingame_default, ingame_dest)
 
-        # state.json をテンプレートからコピー
-        state_template = self.templates_path / "state_default.json"
-        if state_template.exists():
-            shutil.copy(state_template, slot_path / "state.json")
+        # Step 2: state.json をデフォルトからコピー
+        state_default = self.templates_path / "state_default.json"
+        if state_default.exists():
+            shutil.copy(state_default, slot_path / "state.json")
 
-        # meta.json を作成
+        # Step 3: Stage固有ファイルで上書き（指定時のみ）
+        if stage_id:
+            stage_path = self.templates_path / "stages" / stage_id
+
+            if stage_path.exists():
+                # Stage固有のstate.jsonがあれば上書き
+                stage_state = stage_path / "state.json"
+                if stage_state.exists():
+                    shutil.copy(stage_state, slot_path / "state.json")
+
+                # Stage固有のingame/ファイルで上書き（game.py以外）
+                stage_ingame = stage_path / "ingame"
+                if stage_ingame.exists():
+                    for file in stage_ingame.iterdir():
+                        # game.py はスキップ（核心部分は上書きしない）
+                        if file.name == "game.py":
+                            continue
+                        dest_file = ingame_dest / file.name
+                        if file.is_file():
+                            shutil.copy(file, dest_file)
+                        elif file.is_dir():
+                            if dest_file.exists():
+                                shutil.rmtree(dest_file)
+                            shutil.copytree(file, dest_file)
+
+        # meta.json を作成（stage.json の情報も含む）
         now = datetime.now().isoformat()
         meta = {
             "created_at": now,
             "last_played": now,
             "turn": 0,
             "slot": slot,
+            "loaded_stage": stage_id,
         }
+
+        # stage.json があれば情報を追加
+        if stage_id:
+            stage_json_path = self.templates_path / "stages" / stage_id / "stage.json"
+            if stage_json_path.exists():
+                try:
+                    stage_info = json.loads(stage_json_path.read_text(encoding="utf-8"))
+                    meta["stage_name"] = stage_info.get("name", stage_id)
+                    meta["stage_name_ja"] = stage_info.get("name_ja", "")
+                    meta["stage_description_ja"] = stage_info.get("description_ja", "")
+                    meta["stage_commands"] = stage_info.get("commands", [])
+                    meta["stage_help_text"] = stage_info.get("help_text", "")
+                except json.JSONDecodeError:
+                    pass
+
         (slot_path / "meta.json").write_text(
             json.dumps(meta, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
 
         # log.txt を作成
+        stage_name = meta.get("stage_name") or stage_id or "default"
         (slot_path / "log.txt").write_text(
-            f"[{now}] SAVE_{slot} initialized\n",
+            f"[{now}] SAVE_{slot} initialized with stage: {stage_name}\n",
             encoding="utf-8",
         )
 
         return True
 
-    def reset(self, slot: SlotName) -> bool:
+    def reset(self, slot: SlotName, stage_id: str | None = None) -> bool:
         """
         スロットをテンプレート状態にリセット
+
+        Args:
+            slot: スロット名
+            stage_id: Stage ID。指定時はそのStageでリセット。
+                      未指定時は現在のloaded_stageを使用。
 
         Returns:
             成功したらTrue
@@ -151,9 +211,14 @@ class SaveManager:
         if not slot_path.exists():
             return False
 
+        # 未指定の場合は現在のloaded_stageを使用
+        if stage_id is None:
+            status = self.get_slot_status(slot)
+            stage_id = status.loaded_stage
+
         # 削除して再セットアップ
         shutil.rmtree(slot_path)
-        return self.setup(slot)
+        return self.setup(slot, stage_id)
 
     def delete(self, slot: SlotName) -> bool:
         """
