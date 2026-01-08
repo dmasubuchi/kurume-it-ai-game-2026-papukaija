@@ -1,0 +1,431 @@
+{
+  "presentation": {
+    "metadata": {
+      "title": "AI技術の活用（ゲームとAI）2026",
+      "author": "久留米大学",
+      "date": "2026-01-08",
+      "generated_at": "2026-01-08T22:27:37.875259"
+    },
+    "theme": {},
+    "assets": {
+      "diagrams": [
+        {
+          "id": "diagram_001",
+          "type": "mermaid",
+          "source": "flowchart LR\n    subgraph 2025\n        A1[個人の生産性向上]\n        A2[補助ツール]\n    end\n    subgraph 2026\n        B1[チーム工程に浸透]\n        B2[制作フローの再設計]\n        B3[品質・責任の課題]\n    end\n    A1 --> B1\n    A2 --> B2\n    B1 --> B3",
+          "output_path": "assets/diagrams/diagram_001.png",
+          "status": "generated"
+        },
+        {
+          "id": "diagram_002",
+          "type": "mermaid",
+          "source": "flowchart LR\n    A[自然言語で意図を伝える] --> B[AIが実装案を生成]\n    B --> C{理解して進む?}\n    C -->|Yes| D[成功: 検証と改善が可能]\n    C -->|No| E[失敗: 破綻の蓄積]\n    E --> F[生成的負債の増加]\n    D --> G[品質と速度の両立]",
+          "output_path": "assets/diagrams/diagram_002.png",
+          "status": "generated"
+        },
+        {
+          "id": "diagram_003",
+          "type": "mermaid",
+          "source": "flowchart TB\n    subgraph 思考が粗い\n        A1[曖昧な目的] --> A2[雑な指示]\n        A2 --> A3[それっぽい破綻を量産]\n        A3 --> A4[品質不安定・責任曖昧]\n    end\n    subgraph 思考が精密\n        B1[明確な目的] --> B2[具体的な指示]\n        B2 --> B3[検証と編集が高速化]\n        B3 --> B4[品質と速度の両立]\n    end",
+          "output_path": "assets/diagrams/diagram_003.png",
+          "status": "generated"
+        },
+        {
+          "id": "diagram_004",
+          "type": "mermaid",
+          "source": "flowchart LR\n    A[ゲーム×AI基礎] --> B[ゲームAI手法]\n    B --> C[生成AI/Vibe Coding]\n    C --> D[人間×AI協働]\n    D --> E[学び方・進路]\n\n    A -.-> |GPU/リアルタイム| B\n    B -.-> |FSM/BT/RL| C\n    C -.-> |功罪の理解| D\n    D -.-> |設計力| E",
+          "output_path": "assets/diagrams/diagram_004.png",
+          "status": "generated"
+        }
+      ],
+      "images": []
+    },
+    "slides": [
+      {
+        "layout": "title",
+        "elements": [
+          {
+            "type": "title",
+            "content": "AI技術の活用（ゲームとAI）2026"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "第1章 導入・問題提起"
+          },
+          {
+            "type": "text",
+            "content": "本講義の概要と、AI時代における人間の役割を整理する"
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "AI技術の活用（ゲームとAI）2026"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "LLM時代の「作り方」と「人間の役割」",
+              "生成AI/LLMがゲーム制作の現場に浸透",
+              "「作業効率化」から「作り方の再設計」へ",
+              "でもゲームの本体は「体験設計」",
+              "AI時代に価値を持つのは誰か？を整理する"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "本講義で使用するリンク・資料"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "アンケート（好きなゲーム/AIツール経験）",
+              "GitHub（サンプルコード/講義資料）",
+              "デモ（Sample Game：実際に動くAI）",
+              "本資料PDFリンク（後日配布）"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "自己紹介"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "ゲーム技術・オンライン領域・AI活用の経験",
+              "講義の目的：現場感と基礎の橋渡し",
+              "今日は「技術紹介」より「構造理解」を優先",
+              "質問歓迎（途中でもOK）"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "2025→2026：この1年で何が変わったか"
+          },
+          {
+            "type": "diagram",
+            "asset_ref": "diagram_001"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "LLMが「一部の人の道具」から「普通の道具」へ",
+              "個人制作だけでなく、チーム工程にも浸透",
+              "企画→実装→テスト→運用の速度が上がった",
+              "でも品質と責任の課題も増えた",
+              "\"タスク自動化\"から\"工程再設計\"へシフト"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "生成AIとLLMの社会的浸透"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "文章/画像/コードの生成が日常化",
+              "「検索」ではなく「生成」が入口になる場面が増加",
+              "使える人と使えない人の差が拡大",
+              "その差は知識量ではなく「思考の型」で決まる",
+              "プロンプトの上手さ ≠ 言葉のうまさ、設計のうまさ"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "バイブコーディング（Vibe Coding）とは何か"
+          },
+          {
+            "type": "diagram",
+            "asset_ref": "diagram_002"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "自然言語で意図を伝える→AIがコードを生成→人間が監督",
+              "MVPや試作は爆速化できる",
+              "ただし「理解せずに進む」リスクが高い",
+              "ゲームは破綻が「動き」で見えるため誤魔化しが効かない",
+              "「プロンプト＝プログラム」という認識が必要"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "Vibe Codingの落とし穴：生成的負債"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "構造的負債：設計パターンの欠如、責務の混在",
+              "幻覚的複雑性：不要なコード、存在しないAPI呼び出し",
+              "省略された検証：エッジケース未対応、セキュリティ考慮なし",
+              "初学者の罠：Illusion of Competence（能力の錯覚）",
+              "「動いた」≠「正しい」≠「良い設計」"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "今日の結論：AIは能力ではなく増幅器"
+          },
+          {
+            "type": "diagram",
+            "asset_ref": "diagram_003"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "AIは人の思考の質を増幅する",
+              "思考が粗い → 雑な成果が量産される（それっぽい破綻）",
+              "思考が精密 → 検証と編集が高速化する",
+              "重要なのは「因数分解・明確化・判断」の3層",
+              "同じAIでも結果が割れる理由はここにある"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "差がつく3つの能力"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "**因数分解**：問題を部品に分解できる力",
+              "coding / 画像 / level design / データ / QA / 運用",
+              "AIに「何を任せたいか」を明確にする前提条件",
+              "**明確化**：仮説・目的・制約を言語化できる力",
+              "曖昧なまま投げると、曖昧な答えが返ってくる",
+              "**判断**：何を採用し、何を捨てるか決められる力",
+              "AIは提案できても責任は持てない"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "本講義のゴール"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "ゲームAIの主要パターンを「部品」として理解する",
+              "生成AIの強み/限界を構造で説明できるようになる",
+              "AIに使われず、AIを使いこなす手順を持つ",
+              "研究/産業どちらでも貢献できる視点を得る",
+              "最終目標：「設計できる人」になる"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "本講義のロードマップ"
+          },
+          {
+            "type": "diagram",
+            "asset_ref": "diagram_004"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "ゲーム技術がAIを育てた（GPU/リアルタイム制約）",
+              "ゲームAIの基礎（FSM/A*/BT/機械学習/強化学習）",
+              "生成AI/Vibe Codingの現実（功罪と限界）",
+              "人間×AI協働（因数分解・明確化・判断）",
+              "学び方・進路（研究も産業も、作って貢献）"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "ゲームはAI時代の最良の教材である"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "状態があり、バグが「動き」で見える",
+              "制約が厳しく、誤魔化しが効かない（リアルタイム・決定性・コスト）",
+              "判断と検証が連続する",
+              "だから「思考の筋トレ」になる",
+              "ゲームは **AI時代の人間力（分解・記述・判断）** を鍛える実験場"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "ワーク0：あなたはAIをどこで使ってる？"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "企画・アイデア出し",
+              "コード生成・補助",
+              "画像・アセット生成",
+              "学習・調べもの",
+              "まだ使っていない"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "→ 受講者の現在地を把握し、講義の接点を確認する"
+          },
+          {
+            "type": "text",
+            "content": "---"
+          }
+        ]
+      },
+      {
+        "layout": "content",
+        "elements": [
+          {
+            "type": "title",
+            "content": "この章のまとめ"
+          },
+          {
+            "type": "bullet_list",
+            "content": [
+              "2026年：AIは「便利ツール」から制作の\"環境\"へ変化",
+              "でも勝敗はAI性能ではなく「使う人の思考」で決まる",
+              "今日の問い：**私はAIに使われる側か？使いこなす側か？**",
+              "次章以降で「ゲームとAI」の関係、技術の部品、人間の役割を深掘りする"
+            ]
+          }
+        ]
+      }
+    ],
+    "processing_log": [
+      "h1をタイトルスライドとして処理: AI技術の活用（ゲームとAI）2026",
+      "h2で新規スライド: 第1章 導入・問題提起",
+      "h2で新規スライド: AI技術の活用（ゲームとAI）2026",
+      "h2で新規スライド: 本講義で使用するリンク・資料",
+      "h2で新規スライド: 自己紹介",
+      "h2で新規スライド: 2025→2026：この1年で何が変わったか",
+      "h2で新規スライド: 生成AIとLLMの社会的浸透",
+      "h2で新規スライド: バイブコーディング（Vibe Coding）とは何か",
+      "h2で新規スライド: Vibe Codingの落とし穴：生成的負債",
+      "h2で新規スライド: 今日の結論：AIは能力ではなく増幅器",
+      "h2で新規スライド: 差がつく3つの能力",
+      "h2で新規スライド: 本講義のゴール",
+      "h2で新規スライド: 本講義のロードマップ",
+      "h2で新規スライド: ゲームはAI時代の最良の教材である",
+      "h2で新規スライド: ワーク0：あなたはAIをどこで使ってる？",
+      "h2で新規スライド: この章のまとめ",
+      "Mermaid図生成成功: diagram_001",
+      "Mermaid図生成成功: diagram_002",
+      "Mermaid図生成成功: diagram_003",
+      "Mermaid図生成成功: diagram_004"
+    ]
+  }
+}

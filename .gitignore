@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+__pycache__/
+*.pyc
+
+# User saves (do not track)
+02_tutorial/saves/
+
+# Generated files (optional)
+01_lectures/slides/*.pptx
+
+# IDE
+.vscode/
+.idea/

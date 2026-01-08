@@ -1,0 +1,95 @@
+# テーマ設定ファイル
+# AI技術の活用（ゲームとAI）2026
+
+metadata:
+  default_author: "久留米大学"
+  date_format: "%Y-%m-%d"
+
+slide:
+  width_inches: 13.333
+  height_inches: 7.5
+
+colors:
+  background: "#FFFFFF"
+  background_dark: "#113178"
+  primary: "#113178"
+  secondary: "#1a4a9e"
+  text: "#333333"
+  text_light: "#FFFFFF"
+  text_secondary: "#666666"
+  accent: "#113178"
+
+fonts:
+  heading:
+    name: "Kiwi Maru Medium"
+    fallback: "游ゴシック"
+    size: 32
+    bold: false
+  body:
+    name: "Kiwi Maru"
+    fallback: "游ゴシック"
+    size: 20
+    bold: false
+  caption:
+    name: "Kiwi Maru"
+    fallback: "游ゴシック"
+    size: 16
+    bold: false
+  title_slide:
+    name: "Kiwi Maru Medium"
+    fallback: "游ゴシック"
+    size: 44
+    bold: false
+
+decorations:
+  enabled: true
+  accent_line:
+    enabled: true
+    color: "#113178"
+    height: 0.1
+    position: "top"
+  corner_accent:
+    enabled: false
+
+mermaid:
+  theme: "default"
+  background: "white"
+  scale: 2
+  font_family: "Kiwi Maru"
+
+image_generation:
+  default_width: 1024
+  default_height: 768
+  default_model: "stable-diffusion"
+  placeholder_color: "#EEEEEE"
+  placeholder_text: "[画像プレースホルダー]"
+
+layouts:
+  title:
+    background_type: "color"
+    background_value: "#113178"
+    title_color: "#FFFFFF"
+    subtitle_color: "#CCCCCC"
+  section:
+    background_type: "color"
+    background_value: "#113178"
+    title_color: "#FFFFFF"
+  content:
+    background_type: "color"
+    background_value: "#FFFFFF"
+    title_color: "#113178"
+    text_color: "#333333"
+  two_column:
+    background_type: "color"
+    background_value: "#FFFFFF"
+    column_gap: 0.5
+  visual:
+    background_type: "color"
+    background_value: "#FFFFFF"
+    image_max_width: 10.0
+    image_max_height: 5.0
+
+output:
+  filename_prefix: "AI技術の活用"
+  filename_suffix: ""
+  include_timestamp: true
