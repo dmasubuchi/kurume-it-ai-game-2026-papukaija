@@ -2,8 +2,9 @@
   "id": "step_00",
   "name": "Step 00: Hello World",
   "name_ja": "プロジェクト確認",
+  "mode": "WELCOME",
   "description": "Verify project setup and environment",
   "description_ja": "環境構築とプロジェクト動作確認",
-  "commands": ["move", "status", "help", "quit"],
-  "help_text": "プロジェクトが正しく動作することを確認しましょう"
+  "commands": ["w/a/s/d", "status", "help", "quit"],
+  "help_text": "w/a/s/d で移動、status で状態確認。プロジェクトが正しく動作することを確認しましょう"
 }

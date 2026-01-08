@@ -1,14 +1,17 @@
 {
   "version": "1.0",
   "player": {
+    "id": "player",
     "name": "Player",
     "x": 10,
-    "y": 10,
+    "y": 5,
     "hp": 100,
     "max_hp": 100
   },
   "entities": [],
   "turn": 0,
   "score": 0,
-  "is_game_over": false
+  "is_game_over": false,
+  "map_width": 20,
+  "map_height": 10
 }

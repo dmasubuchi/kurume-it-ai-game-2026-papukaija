@@ -177,6 +177,7 @@ class SaveManager:
                     meta["stage_description_ja"] = stage_info.get("description_ja", "")
                     meta["stage_commands"] = stage_info.get("commands", [])
                     meta["stage_help_text"] = stage_info.get("help_text", "")
+                    meta["stage_mode"] = stage_info.get("mode", "INTERPRETER")
                 except json.JSONDecodeError:
                     pass
 

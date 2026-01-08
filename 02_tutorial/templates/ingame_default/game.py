@@ -215,35 +215,90 @@ def execute_ai_turn(state: GameState, interpreter: Interpreter) -> GameState:
     return current_state.next_turn()
 
 
-def create_update(slot_path: Path, interpreter: Interpreter, meta: dict | None = None):
-    """update関数を作成"""
+def create_simple_update(slot_path: Path, meta: dict | None = None):
+    """Simple mode用のupdate関数（w/a/s/d移動、WELCOME/STATE/IO/RENDERERモード用）"""
+    meta = meta or {}
+    stage_commands = meta.get("stage_commands", [])
+    stage_help = meta.get("stage_help_text", "")
+
+    # 方向マッピング
+    moves = {
+        "w": (0, -1), "up": (0, -1),
+        "s": (0, 1), "down": (0, 1),
+        "a": (-1, 0), "left": (-1, 0),
+        "d": (1, 0), "right": (1, 0),
+    }
+
+    def update(state: GameState, cmd: str) -> GameState:
+        cmd = cmd.strip().lower()
+
+        if cmd == "help":
+            output("\n=== Commands ===")
+            if stage_commands:
+                for cmd_text in stage_commands:
+                    output(f"  {cmd_text}")
+            else:
+                output("  w/a/s/d  - Move (up/left/down/right)")
+                output("  status   - Show status")
+                output("  save     - Save game")
+                output("  quit     - Exit")
+            if stage_help:
+                output("")
+                output(stage_help)
+            output("")
+            return state
+
+        if cmd == "status":
+            output(f"\nTurn: {state.turn}")
+            output(f"Position: ({state.player.pos.x}, {state.player.pos.y})")
+            output(f"HP: {state.player.hp}")
+            output("")
+            return state
+
+        if cmd == "save":
+            save_state(state, slot_path)
+            update_meta(slot_path, state)
+            output("Game saved.")
+            return state
+
+        # 移動コマンド
+        if cmd in moves:
+            dx, dy = moves[cmd]
+            new_state = state.move_player(dx, dy).next_turn()
+
+            if config.AUTO_SAVE:
+                save_state(new_state, slot_path)
+                update_meta(slot_path, new_state)
+
+            return new_state.add_log(f"Moved to ({new_state.player.pos.x}, {new_state.player.pos.y})")
+
+        output(f"Unknown command: {cmd}")
+        output("Type 'help' for commands.")
+        return state
+
+    return update
+
+
+def create_loop_update(slot_path: Path, meta: dict | None = None):
+    """LOOP mode用のupdate関数（カウンター増減）"""
     meta = meta or {}
     stage_commands = meta.get("stage_commands", [])
     stage_help = meta.get("stage_help_text", "")
 
     def update(state: GameState, cmd: str) -> GameState:
-        """コマンドを実行して新しい状態を返す"""
-        cmd = cmd.strip()
+        cmd = cmd.strip().lower()
 
-        # 特殊コマンド
         if cmd == "help":
             output("\n=== Commands ===")
-            # stage固有コマンドがあれば表示（status/save/quitは含まれている想定）
             if stage_commands:
                 for cmd_text in stage_commands:
                     output(f"  {cmd_text}")
             else:
-                # デフォルトコマンド一覧
-                output("  move player <x> <y>  - Move player")
-                output("  spawn <type> <x> <y> - Spawn entity")
-                output("  destroy <target>     - Destroy entity")
-                output("  set <entity>.<prop> <value>")
-                output("  if <condition> then <action>")
-                output("  wait                 - AI turn")
-                output("  status               - Show status")
-                output("  save                 - Manual save")
-                output("  quit                 - Exit game")
-            # stage固有ヘルプがあれば表示
+                output("  up / +   - Increment score")
+                output("  down / - - Decrement score")
+                output("  reset    - Reset score to 0")
+                output("  status   - Show status")
+                output("  quit     - Exit")
             if stage_help:
                 output("")
                 output(stage_help)
@@ -253,7 +308,66 @@ def create_update(slot_path: Path, interpreter: Interpreter, meta: dict | None =
         if cmd == "status":
             output(f"\nTurn: {state.turn}")
             output(f"Score: {state.score}")
-            output(f"Player HP: {state.player.hp}")
+            output("")
+            return state
+
+        if cmd in ("up", "+"):
+            new_state = state.replace(score=state.score + 1).next_turn()
+            output(f"Score: {new_state.score}")
+            return new_state
+
+        if cmd in ("down", "-"):
+            new_state = state.replace(score=state.score - 1).next_turn()
+            output(f"Score: {new_state.score}")
+            return new_state
+
+        if cmd == "reset":
+            new_state = state.replace(score=0).next_turn()
+            output("Score reset to 0")
+            return new_state
+
+        output(f"Unknown command: {cmd}")
+        return state
+
+    return update
+
+
+def create_dsl_update(slot_path: Path, interpreter: Interpreter, meta: dict | None = None, show_tokens: bool = False, show_ast: bool = False):
+    """DSL mode用のupdate関数（LEXER/PARSER/INTERPRETERモード用）"""
+    meta = meta or {}
+    stage_commands = meta.get("stage_commands", [])
+    stage_help = meta.get("stage_help_text", "")
+
+    # Lexerが必要な場合
+    if show_tokens:
+        from src.dsl.lexer import tokenize
+
+    def update(state: GameState, cmd: str) -> GameState:
+        cmd = cmd.strip()
+
+        if cmd == "help":
+            output("\n=== Commands ===")
+            if stage_commands:
+                for cmd_text in stage_commands:
+                    output(f"  {cmd_text}")
+            else:
+                output("  move player <dx> <dy> - Move player")
+                output("  spawn <type> <x> <y>  - Spawn entity")
+                output("  destroy <target>      - Destroy entity")
+                output("  set <entity>.<prop> <value>")
+                output("  if <condition> then <action>")
+                output("  wait                  - AI turn")
+                output("  status / save / quit")
+            if stage_help:
+                output("")
+                output(stage_help)
+            output("")
+            return state
+
+        if cmd == "status":
+            output(f"\nTurn: {state.turn}")
+            output(f"Score: {state.score}")
+            output(f"Player: ({state.player.pos.x}, {state.player.pos.y}) HP={state.player.hp}")
             output(f"Entities: {len(state.entities)}")
             output("")
             return state
@@ -265,24 +379,38 @@ def create_update(slot_path: Path, interpreter: Interpreter, meta: dict | None =
             return state
 
         if cmd == "wait":
-            # AIターン実行
             return execute_ai_turn(state, interpreter)
 
         # DSLコマンドを実行
         try:
-            result = interpreter.execute(parse(cmd), state)
+            # トークン表示
+            if show_tokens:
+                tokens = tokenize(cmd)
+                output("\n[Tokens]")
+                for tok in tokens:
+                    output(f"  {tok}")
+                output("")
+
+            # AST生成
+            ast = parse(cmd)
+
+            # AST表示
+            if show_ast:
+                output("\n[AST]")
+                output(f"  {ast}")
+                output("")
+
+            # 実行
+            result = interpreter.execute(ast, state)
             new_state = result.state.next_turn()
 
-            # エラー表示
             for error in result.errors:
                 output(f"Error: {error.message}")
 
-            # ログ
             if config.DEBUG:
                 for log in result.logs:
                     output(f"  {log}")
 
-            # 自動保存
             if config.AUTO_SAVE:
                 save_state(new_state, slot_path)
                 update_meta(slot_path, new_state)
@@ -294,6 +422,31 @@ def create_update(slot_path: Path, interpreter: Interpreter, meta: dict | None =
             return state
 
     return update
+
+
+def create_update(slot_path: Path, interpreter: Interpreter, meta: dict | None = None):
+    """modeに応じたupdate関数を作成"""
+    meta = meta or {}
+    mode = meta.get("stage_mode", "INTERPRETER")
+
+    # Simple modes (w/a/s/d 移動)
+    if mode in ("WELCOME", "STATE", "IO", "RENDERER"):
+        return create_simple_update(slot_path, meta)
+
+    # Loop mode (カウンター)
+    if mode == "LOOP":
+        return create_loop_update(slot_path, meta)
+
+    # Lexer demo mode (トークン表示 + 実行)
+    if mode == "LEXER":
+        return create_dsl_update(slot_path, interpreter, meta, show_tokens=True, show_ast=False)
+
+    # Parser demo mode (AST表示 + 実行)
+    if mode == "PARSER":
+        return create_dsl_update(slot_path, interpreter, meta, show_tokens=False, show_ast=True)
+
+    # Interpreter mode (通常のDSL実行)
+    return create_dsl_update(slot_path, interpreter, meta, show_tokens=False, show_ast=False)
 
 
 def load_meta(slot_path: Path) -> dict:
@@ -316,12 +469,14 @@ def run(slot_path: Path) -> None:
     stage_name = meta.get("stage_name") or meta.get("loaded_stage") or "Game"
     stage_name_ja = meta.get("stage_name_ja", "")
     stage_help = meta.get("stage_help_text", "")
+    stage_mode = meta.get("stage_mode", "INTERPRETER")
 
     print()
     print("=" * 50)
     print(f"  {stage_name}")
     if stage_name_ja:
         print(f"  {stage_name_ja}")
+    print(f"  Mode: {stage_mode}")
     print("=" * 50)
     print(f"SAVE: {slot_path.name}")
     if stage_help:

@@ -2,8 +2,9 @@
   "id": "step_03",
   "name": "Step 03: I/O Separation",
   "name_ja": "入出力の分離",
+  "mode": "IO",
   "description": "Separate I/O from game logic",
   "description_ja": "ゲームロジックと入出力を分離する設計を学びます",
-  "commands": ["move player <x> <y>", "status", "help", "quit"],
-  "help_text": "入力・出力がゲームロジックから分離されています"
+  "commands": ["w/a/s/d", "status", "help", "quit"],
+  "help_text": "w/a/s/d で移動。入力・出力がゲームロジックから分離されています"
 }

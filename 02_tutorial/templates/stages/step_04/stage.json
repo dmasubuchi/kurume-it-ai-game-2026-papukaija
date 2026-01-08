@@ -2,8 +2,9 @@
   "id": "step_04",
   "name": "Step 04: TextGrid Renderer",
   "name_ja": "テキストグリッドレンダラー",
+  "mode": "RENDERER",
   "description": "Pure function rendering with TextGrid",
   "description_ja": "純粋関数としてのレンダリングを学びます",
-  "commands": ["move player <x> <y>", "spawn enemy <x> <y>", "status", "help", "quit"],
-  "help_text": "spawn enemy 15 5 で敵を生成。レンダラーは状態から文字列を生成します"
+  "commands": ["w/a/s/d", "spawn enemy <x> <y>", "status", "help", "quit"],
+  "help_text": "w/a/s/d で移動。spawn enemy 15 5 で敵を生成。レンダラーは状態から文字列を生成します"
 }

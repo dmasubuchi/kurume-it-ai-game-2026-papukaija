@@ -2,8 +2,9 @@
   "id": "step_06",
   "name": "Step 06: DSL Parser",
   "name_ja": "DSL構文解析",
+  "mode": "PARSER",
   "description": "Parse tokens into AST",
   "description_ja": "トークンをAST（抽象構文木）に変換する仕組みを学びます",
   "commands": ["move player <x> <y>", "spawn <type> <x> <y>", "destroy <target>", "set <entity>.<prop> <value>", "if <cond> then <action>", "status", "help", "quit"],
-  "help_text": "if player.hp < 50 then set player.state danger のような条件文も使えます"
+  "help_text": "DSLコマンドがAST（構文木）として表示されます（AST表示後に実行）"
 }

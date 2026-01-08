@@ -2,6 +2,7 @@
   "id": "step_01",
   "name": "Step 01: Game Loop",
   "name_ja": "ゲームループの基礎",
+  "mode": "LOOP",
   "description": "Learn the basic turn-based game loop pattern",
   "description_ja": "カウンターを増減させてゲームループを体験します",
   "commands": ["up", "+", "down", "-", "reset", "help", "quit"],
