@@ -3,6 +3,7 @@
   "name": "Step 09: Enemy AI (FSM)",
   "name_ja": "敵AI（有限状態機械）",
   "mode": "FSM",
+  "input_mode": "GAME",
   "description": "FSM-based enemy AI generates MOVE commands",
   "description_ja": "FSM（有限状態機械）で敵AIがMOVE命令を生成する仕組みを学びます",
   "goal": "FSM（状態と遷移）で敵AIが命令（MOVE）を生成することを理解する",

@@ -3,6 +3,7 @@
   "name": "Step 07: Interpreter",
   "name_ja": "DSLインタプリタ",
   "mode": "INTERPRETER",
+  "input_mode": "DSL",
   "description": "Execute AST to modify game state",
   "description_ja": "ASTを実行してゲーム状態を変更する仕組みを学びます",
   "goal": "DSLコマンドがStateを変えることを体感する（実行される！）",

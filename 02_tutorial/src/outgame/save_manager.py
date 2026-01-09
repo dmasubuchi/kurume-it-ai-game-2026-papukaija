@@ -178,6 +178,7 @@ class SaveManager:
                     meta["stage_commands"] = stage_info.get("commands", [])
                     meta["stage_help_text"] = stage_info.get("help_text", "")
                     meta["stage_mode"] = stage_info.get("mode", "INTERPRETER")
+                    meta["stage_input_mode"] = stage_info.get("input_mode", "GAME")
                     meta["stage_goal"] = stage_info.get("goal", "")
                     meta["stage_examples"] = stage_info.get("examples", [])
                     meta["stage_try_first"] = stage_info.get("try_first", "")

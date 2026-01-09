@@ -3,6 +3,7 @@
   "name": "Step 08: A* Pathfinding",
   "name_ja": "A*経路探索",
   "mode": "PATHFINDING",
+  "input_mode": "GAME",
   "description": "A* pathfinding generates MOVE commands executed by Interpreter",
   "description_ja": "A*アルゴリズムで経路を計算し、MOVE命令列として実行します",
   "goal": "A*で経路を計算し、MOVE命令列を生成してInterpreterで実行する",

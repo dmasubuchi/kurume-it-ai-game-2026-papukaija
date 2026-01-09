@@ -3,6 +3,7 @@
   "name": "Step 11: Enemy AI (GOAP)",
   "name_ja": "敵AI（目標指向行動計画）",
   "mode": "GOAP",
+  "input_mode": "GAME",
   "description": "GOAP-based enemy AI generates action plans to achieve goals",
   "description_ja": "GOAP（Goal-Oriented Action Planning）で敵AIが目標達成のための行動計画を生成する仕組みを学びます",
   "goal": "GOAPで敵AIが目標から行動列を逆算して生成することを理解する",

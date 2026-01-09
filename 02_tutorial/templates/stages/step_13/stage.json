@@ -3,6 +3,7 @@
   "name": "Step 13: Human x AI x Rules",
   "name_ja": "人間 x AI x ルール",
   "mode": "INTEGRATION",
+  "input_mode": "MIXED",
   "description": "Understanding the separation of responsibilities between Human, AI, and Rules",
   "description_ja": "人間・AI・ルールの責任分界を理解します",
   "goal": "人間・AI・LLM・ルールの責任分界を理解する",

@@ -3,6 +3,7 @@
   "name": "Step 05: DSL Lexer",
   "name_ja": "DSL字句解析",
   "mode": "LEXER",
+  "input_mode": "DSL",
   "description": "Tokenize DSL commands",
   "description_ja": "コマンド文字列をトークンに分解する仕組みを学びます",
   "goal": "DSLコマンド文字列がどんなトークン列になるか観察する（実行しない）",

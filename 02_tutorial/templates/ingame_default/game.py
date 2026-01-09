@@ -43,6 +43,143 @@ except ImportError:
     import config  # type: ignore
 
 
+# =====================
+# Friendly Input Guide
+# =====================
+
+# 自然言語入力の変換マップ
+NATURAL_INPUT_MAP = {
+    "go right": "d",
+    "move right": "d",
+    "right": "d",
+    "go left": "a",
+    "move left": "a",
+    "left": "a",
+    "go up": "w",
+    "move up": "w",
+    "up": "w",
+    "go down": "s",
+    "move down": "s",
+    "down": "s",
+}
+
+
+def show_input_guide(cmd: str, input_mode: str, stage_mode: str) -> bool:
+    """
+    入力ガイドを表示する。
+    Returns: True if guide was shown (unknown command), False otherwise
+    """
+    cmd_lower = cmd.lower().strip()
+
+    # 自然言語入力の救済
+    if cmd_lower in NATURAL_INPUT_MAP:
+        correct = NATURAL_INPUT_MAP[cmd_lower]
+        output(f"\nInput not recognized: {cmd}")
+        output("")
+        output(f"Hint: To {cmd_lower.replace('go ', '').replace('move ', '')}:")
+        output(f"  Type: {correct}")
+        output("")
+        return True
+
+    # GAMEモードでDSLっぽい入力が来た場合
+    if input_mode == "GAME":
+        # DSLっぽいパターンをチェック
+        dsl_patterns = ["move ", "spawn ", "destroy ", "set ", "if ", "goto "]
+        is_dsl_like = any(cmd_lower.startswith(p) for p in dsl_patterns)
+
+        if is_dsl_like:
+            output(f"\nInput not recognized: {cmd}")
+            output("")
+            output("This Step uses game controls, not DSL commands.")
+            output("")
+            output("Game controls:")
+            output("  w / a / s / d  : move player")
+            output("  wait           : observe AI behavior")
+            output("")
+            output("If you want to use DSL commands,")
+            output("please select Step 07 (Interpreter) or Step 13 (Integration).")
+            output("")
+            return True
+
+        # 通常のunknown
+        output(f"\nInput not recognized: {cmd}")
+        output("")
+        output("This Step uses these commands:")
+        output("  w / a / s / d  : move player")
+        output("  wait           : observe AI")
+
+        # モード固有のヒント
+        if stage_mode == "FSM":
+            output("  ai             : show FSM debug")
+        elif stage_mode == "BT":
+            output("  bt             : show BT structure")
+        elif stage_mode == "GOAP":
+            output("  goap           : show GOAP debug")
+        elif stage_mode == "DIRECTOR":
+            output("  director       : show tension status")
+        elif stage_mode == "PATHFINDING":
+            output("  path x y       : show path")
+            output("  goto x y       : start auto-move")
+
+        output("")
+        output("Type 'help' for all commands.")
+        output("")
+        return True
+
+    # DSLモードでゲーム操作が来た場合
+    if input_mode == "DSL":
+        game_controls = ["w", "a", "s", "d", "up", "down", "left", "right"]
+        if cmd_lower in game_controls:
+            output(f"\nInput not recognized: {cmd}")
+            output("")
+            output("This Step uses DSL input, not game controls.")
+            output("")
+            output("Example DSL commands:")
+            output("  move player 5 3")
+            output("  spawn enemy 10 5")
+            output("  if player.hp < 50 then set player.state danger")
+            output("")
+            output("Type 'examples' to see more.")
+            output("")
+            return True
+
+        # 通常のunknown
+        output(f"\nInput not recognized: {cmd}")
+        output("")
+        output("This Step uses DSL commands.")
+        output("Type 'examples' to see sample DSL commands.")
+        output("")
+        return True
+
+    # MIXEDモード
+    if input_mode == "MIXED":
+        output(f"\nInput not recognized: {cmd}")
+        output("")
+        output("This Step accepts both game controls and DSL:")
+        output("  w / a / s / d  : move player (shortcut)")
+        output("  dsl <cmd>      : execute DSL directly")
+        output("")
+        output("Type 'help' for all commands.")
+        output("")
+        return True
+
+    return False
+
+
+def get_hint_text(input_mode: str, stage_mode: str) -> str:
+    """ヒントテキストを取得"""
+    if input_mode == "DSL":
+        return "Hint: type 'examples' to see DSL samples"
+
+    if input_mode == "MIXED":
+        return "Hint: use 'dsl <cmd>' or w/a/s/d, type 'help' for all"
+
+    # GAME mode
+    if stage_mode == "PATHFINDING":
+        return "Hint: type 'goto x y' for auto-move, or w/a/s/d"
+    return "Hint: type 'wait' to observe AI, or w/a/s/d to move"
+
+
 def load_state(slot_path: Path) -> GameState:
     """state.jsonからGameStateを復元"""
     state_file = slot_path / "state.json"
@@ -225,6 +362,8 @@ def create_simple_update(slot_path: Path, meta: dict | None = None):
     meta = meta or {}
     stage_commands = meta.get("stage_commands", [])
     stage_help = meta.get("stage_help_text", "")
+    stage_input_mode = meta.get("stage_input_mode", "GAME")
+    stage_mode = meta.get("stage_mode", "WELCOME")
 
     # 方向マッピング
     moves = {
@@ -277,8 +416,7 @@ def create_simple_update(slot_path: Path, meta: dict | None = None):
 
             return new_state.add_log(f"Moved to ({new_state.player.pos.x}, {new_state.player.pos.y})")
 
-        output(f"Unknown command: {cmd}")
-        output("Type 'help' for commands.")
+        show_input_guide(cmd, stage_input_mode, stage_mode)
         return state
 
     return update
@@ -289,6 +427,8 @@ def create_loop_update(slot_path: Path, meta: dict | None = None):
     meta = meta or {}
     stage_commands = meta.get("stage_commands", [])
     stage_help = meta.get("stage_help_text", "")
+    stage_input_mode = meta.get("stage_input_mode", "GAME")
+    stage_mode = meta.get("stage_mode", "LOOP")
 
     def update(state: GameState, cmd: str) -> GameState:
         cmd = cmd.strip().lower()
@@ -331,7 +471,7 @@ def create_loop_update(slot_path: Path, meta: dict | None = None):
             output("Score reset to 0")
             return new_state
 
-        output(f"Unknown command: {cmd}")
+        show_input_guide(cmd, stage_input_mode, stage_mode)
         return state
 
     return update
@@ -581,6 +721,8 @@ def create_pathfinding_update(slot_path: Path, interpreter: Interpreter, meta: d
     stage_help = meta.get("stage_help_text", "")
     stage_goal = meta.get("stage_goal", "")
     stage_examples = meta.get("stage_examples", [])
+    stage_input_mode = meta.get("stage_input_mode", "GAME")
+    stage_mode = meta.get("stage_mode", "PATHFINDING")
 
     # 移動キュー（自動移動用）
     move_queue: list[tuple[int, int]] = []
@@ -910,10 +1052,8 @@ def create_pathfinding_update(slot_path: Path, interpreter: Interpreter, meta: d
 
             return new_state
 
-        # 未知のコマンド
-        output(f"\n[Error] Unknown command: {cmd}")
-        output("'help' でコマンド一覧を確認してください。")
-        output("")
+        # 未知のコマンド - フレンドリーガイドを表示
+        show_input_guide(cmd, stage_input_mode, stage_mode)
         return state
 
     return update
@@ -926,6 +1066,8 @@ def create_fsm_update(slot_path: Path, interpreter: Interpreter, meta: dict | No
     stage_help = meta.get("stage_help_text", "")
     stage_goal = meta.get("stage_goal", "")
     stage_examples = meta.get("stage_examples", [])
+    stage_input_mode = meta.get("stage_input_mode", "GAME")
+    stage_mode = meta.get("stage_mode", "FSM")
 
     # AI有効フラグ
     ai_enabled = [True]  # リストで包んでnonlocal不要に
@@ -1306,10 +1448,8 @@ def create_fsm_update(slot_path: Path, interpreter: Interpreter, meta: dict | No
 
             return new_state
 
-        # 未知のコマンド
-        output(f"\n[Error] Unknown command: {cmd}")
-        output("'help' でコマンド一覧を確認してください。")
-        output("")
+        # 未知のコマンド - フレンドリーガイドを表示
+        show_input_guide(cmd, stage_input_mode, stage_mode)
         return state
 
     return update
@@ -1322,6 +1462,8 @@ def create_bt_update(slot_path: Path, interpreter: Interpreter, meta: dict | Non
     stage_help = meta.get("stage_help_text", "")
     stage_goal = meta.get("stage_goal", "")
     stage_examples = meta.get("stage_examples", [])
+    stage_input_mode = meta.get("stage_input_mode", "GAME")
+    stage_mode = meta.get("stage_mode", "BT")
 
     # AI有効フラグ
     ai_enabled = [True]
@@ -1723,9 +1865,7 @@ Root (Selector)
                 update_meta(slot_path, new_state)
             return new_state
 
-        output(f"\n[Error] Unknown command: {cmd}")
-        output("'help' でコマンド一覧を確認してください。")
-        output("")
+        show_input_guide(cmd, stage_input_mode, stage_mode)
         return state
 
     return update
@@ -1738,6 +1878,8 @@ def create_goap_update(slot_path: Path, interpreter: Interpreter, meta: dict | N
     stage_help = meta.get("stage_help_text", "")
     stage_goal = meta.get("stage_goal", "")
     stage_examples = meta.get("stage_examples", [])
+    stage_input_mode = meta.get("stage_input_mode", "GAME")
+    stage_mode = meta.get("stage_mode", "GOAP")
 
     ai_enabled = [True]
     moves = {
@@ -1967,7 +2109,7 @@ def create_goap_update(slot_path: Path, interpreter: Interpreter, meta: dict | N
             new_state, msg = check_collision(new_state)
             if msg: output(msg)
             return new_state.next_turn()
-        output(f"Unknown: {cmd}")
+        show_input_guide(cmd, stage_input_mode, stage_mode)
         return state
 
     return update
@@ -1978,6 +2120,8 @@ def create_director_update(slot_path: Path, interpreter: Interpreter, meta: dict
     meta = meta or {}
     stage_commands = meta.get("stage_commands", [])
     stage_help = meta.get("stage_help_text", "")
+    stage_input_mode = meta.get("stage_input_mode", "GAME")
+    stage_mode = meta.get("stage_mode", "DIRECTOR")
     stage_goal = meta.get("stage_goal", "")
 
     ai_enabled = [True]
@@ -2105,7 +2249,7 @@ def create_director_update(slot_path: Path, interpreter: Interpreter, meta: dict
             new_state, msg = check_collision(new_state)
             if msg: output(msg)
             return new_state.next_turn()
-        output(f"Unknown: {cmd}")
+        show_input_guide(cmd, stage_input_mode, stage_mode)
         return state
 
     return update
@@ -2116,6 +2260,8 @@ def create_integration_update(slot_path: Path, interpreter: Interpreter, meta: d
     meta = meta or {}
     stage_commands = meta.get("stage_commands", [])
     stage_goal = meta.get("stage_goal", "")
+    stage_input_mode = meta.get("stage_input_mode", "MIXED")
+    stage_mode = meta.get("stage_mode", "INTEGRATION")
 
     ai_enabled = [True]
     last_dsl = [""]
@@ -2244,7 +2390,7 @@ def create_integration_update(slot_path: Path, interpreter: Interpreter, meta: d
                 output(f"[AI] Proposed: {ai_dsl}")
             return new_state.next_turn()
 
-        output(f"Unknown: {cmd}")
+        show_input_guide(cmd, stage_input_mode, stage_mode)
         return state
 
     return update
@@ -2320,6 +2466,7 @@ def run(slot_path: Path) -> None:
     stage_name_ja = meta.get("stage_name_ja", "")
     stage_help = meta.get("stage_help_text", "")
     stage_mode = meta.get("stage_mode", "INTERPRETER")
+    stage_input_mode = meta.get("stage_input_mode", "GAME")
     stage_goal = meta.get("stage_goal", "")
     stage_try_first = meta.get("stage_try_first", "")
     stage_examples = meta.get("stage_examples", [])
@@ -2393,8 +2540,11 @@ def run(slot_path: Path) -> None:
     update = create_update(slot_path, interpreter, meta)
 
     # ゲームループ実行
+    hint_text = get_hint_text(stage_input_mode, stage_mode)
+
     def game_get_input() -> str:
         try:
+            print(hint_text)
             return input("CMD> ").strip()
         except EOFError:
             return "quit"

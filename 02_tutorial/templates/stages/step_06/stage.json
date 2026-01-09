@@ -3,6 +3,7 @@
   "name": "Step 06: DSL Parser",
   "name_ja": "DSL構文解析",
   "mode": "PARSER",
+  "input_mode": "DSL",
   "description": "Parse tokens into AST",
   "description_ja": "トークンをAST（抽象構文木）に変換する仕組みを学びます",
   "goal": "DSLコマンドがどんなAST（構文木）になるか観察する（実行しない）",
