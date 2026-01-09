@@ -1,0 +1,8 @@
+%%{init: {'theme': 'base'}}%%
+flowchart LR
+    A["State v1<br>x=10, y=5"] -->|"move(1,0)"| B["State v2<br>x=11, y=5"]
+    B -->|"move(0,1)"| C["State v3<br>x=11, y=6"]
+
+    style A fill:#ffebee,stroke:#c62828,stroke-width:2px
+    style B fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    style C fill:#e8f5e9,stroke:#4caf50,stroke-width:2px

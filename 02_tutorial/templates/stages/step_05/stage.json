@@ -5,6 +5,15 @@
   "mode": "LEXER",
   "description": "Tokenize DSL commands",
   "description_ja": "コマンド文字列をトークンに分解する仕組みを学びます",
-  "commands": ["move player <x> <y>", "spawn <type> <x> <y>", "destroy <target>", "status", "help", "quit"],
-  "help_text": "move player 1 0 などのDSLコマンドがトークンに分解されます（トークン表示後に実行）"
+  "goal": "DSLコマンド文字列がどんなトークン列になるか観察する（実行しない）",
+  "commands": ["help", "examples", "goal", "quit"],
+  "help_text": "DSLコマンドを入力すると、トークン（単語）に分解されます。実行はしません。",
+  "examples": [
+    "move player 5 3",
+    "spawn enemy 10 5",
+    "destroy goblin",
+    "set player.hp 100",
+    "if player.hp < 50 then set player.state danger"
+  ],
+  "try_first": "move player 5 3"
 }

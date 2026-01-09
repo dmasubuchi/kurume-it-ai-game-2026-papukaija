@@ -332,15 +332,159 @@ def create_loop_update(slot_path: Path, meta: dict | None = None):
     return update
 
 
-def create_dsl_update(slot_path: Path, interpreter: Interpreter, meta: dict | None = None, show_tokens: bool = False, show_ast: bool = False):
-    """DSL mode用のupdate関数（LEXER/PARSER/INTERPRETERモード用）"""
+def create_lexer_update(slot_path: Path, meta: dict | None = None):
+    """LEXER mode用のupdate関数（トークン表示のみ、実行しない）"""
+    from src.dsl.lexer import tokenize, tokenize_with_errors
+
+    meta = meta or {}
+    stage_help = meta.get("stage_help_text", "")
+    stage_goal = meta.get("stage_goal", "")
+    stage_examples = meta.get("stage_examples", [])
+
+    def update(state: GameState, cmd: str) -> GameState:
+        cmd = cmd.strip()
+
+        # メタコマンド
+        if cmd == "help":
+            output("\n=== Commands ===")
+            output("  <DSL>     - DSLを入力してトークン化")
+            output("  examples  - サンプルDSLを表示")
+            output("  goal      - このStageの目的")
+            output("  quit      - 終了")
+            if stage_help:
+                output("")
+                output(stage_help)
+            output("")
+            return state
+
+        if cmd == "goal":
+            output(f"\n[Goal] {stage_goal}")
+            output("※ このStageでは実行しません。トークン化のみです。")
+            output("")
+            return state
+
+        if cmd == "examples":
+            output("\n=== Sample DSL ===")
+            for i, ex in enumerate(stage_examples, 1):
+                output(f"  {i}. {ex}")
+            output("\n上記をコピーして入力してみてください")
+            output("")
+            return state
+
+        # ゲーム操作入力への警告
+        if cmd.lower() in ("w", "a", "s", "d", "up", "down", "left", "right"):
+            output(f"\n[Warning] '{cmd}' はゲーム操作です。")
+            output("このStageではDSLコマンドを入力してください。")
+            output("例: move player 5 3")
+            output("'examples' でサンプルを確認できます。")
+            output("")
+            return state
+
+        # DSLをトークン化（実行しない）
+        output(f"\n[Source]")
+        output(f"  {cmd}")
+
+        tokens, errors = tokenize_with_errors(cmd)
+
+        output("\n[Tokens]")
+        for tok in tokens:
+            if str(tok.type) not in ("TokenType.EOF", "TokenType.NEWLINE"):
+                output(f"  {tok}")
+
+        if errors:
+            output("\n[Errors]")
+            for err in errors:
+                output(f"  Line {err.line}, Col {err.column}: {err.message}")
+
+        output("\n※ 実行はしません。トークン化のみです。")
+        output("")
+        return state  # 状態は変更しない
+
+    return update
+
+
+def create_parser_update(slot_path: Path, meta: dict | None = None):
+    """PARSER mode用のupdate関数（AST表示のみ、実行しない）"""
+    from src.dsl.lexer import tokenize
+
+    meta = meta or {}
+    stage_help = meta.get("stage_help_text", "")
+    stage_goal = meta.get("stage_goal", "")
+    stage_examples = meta.get("stage_examples", [])
+
+    def update(state: GameState, cmd: str) -> GameState:
+        cmd = cmd.strip()
+
+        # メタコマンド
+        if cmd == "help":
+            output("\n=== Commands ===")
+            output("  <DSL>     - DSLを入力してAST化")
+            output("  examples  - サンプルDSLを表示")
+            output("  goal      - このStageの目的")
+            output("  quit      - 終了")
+            if stage_help:
+                output("")
+                output(stage_help)
+            output("")
+            return state
+
+        if cmd == "goal":
+            output(f"\n[Goal] {stage_goal}")
+            output("※ このStageでは実行しません。AST生成のみです。")
+            output("")
+            return state
+
+        if cmd == "examples":
+            output("\n=== Sample DSL ===")
+            for i, ex in enumerate(stage_examples, 1):
+                output(f"  {i}. {ex}")
+            output("\n上記をコピーして入力してみてください")
+            output("")
+            return state
+
+        # ゲーム操作入力への警告
+        if cmd.lower() in ("w", "a", "s", "d", "up", "down", "left", "right"):
+            output(f"\n[Warning] '{cmd}' はゲーム操作です。")
+            output("このStageではDSLコマンドを入力してください。")
+            output("例: if player.hp < 50 then set player.state danger")
+            output("'examples' でサンプルを確認できます。")
+            output("")
+            return state
+
+        # DSLをパース（実行しない）
+        output(f"\n[Source]")
+        output(f"  {cmd}")
+
+        try:
+            # トークン化
+            tokens = tokenize(cmd)
+            output("\n[Tokens]")
+            for tok in tokens:
+                if str(tok.type) not in ("TokenType.EOF", "TokenType.NEWLINE"):
+                    output(f"  {tok}")
+
+            # AST生成
+            ast = parse(cmd)
+            output("\n[AST]")
+            output(f"  {ast}")
+
+        except Exception as e:
+            output(f"\n[ParseError] {e}")
+
+        output("\n※ 実行はしません。AST生成のみです。")
+        output("")
+        return state  # 状態は変更しない
+
+    return update
+
+
+def create_interpreter_update(slot_path: Path, interpreter: Interpreter, meta: dict | None = None):
+    """INTERPRETER mode用のupdate関数（フル実行）"""
     meta = meta or {}
     stage_commands = meta.get("stage_commands", [])
     stage_help = meta.get("stage_help_text", "")
-
-    # Lexerが必要な場合
-    if show_tokens:
-        from src.dsl.lexer import tokenize
+    stage_goal = meta.get("stage_goal", "")
+    stage_examples = meta.get("stage_examples", [])
 
     def update(state: GameState, cmd: str) -> GameState:
         cmd = cmd.strip()
@@ -351,16 +495,29 @@ def create_dsl_update(slot_path: Path, interpreter: Interpreter, meta: dict | No
                 for cmd_text in stage_commands:
                     output(f"  {cmd_text}")
             else:
-                output("  move player <dx> <dy> - Move player")
-                output("  spawn <type> <x> <y>  - Spawn entity")
-                output("  destroy <target>      - Destroy entity")
+                output("  move player <x> <y>   - 座標に移動")
+                output("  spawn <type> <x> <y>  - エンティティ生成")
+                output("  destroy <target>      - エンティティ削除")
                 output("  set <entity>.<prop> <value>")
-                output("  if <condition> then <action>")
-                output("  wait                  - AI turn")
-                output("  status / save / quit")
+                output("  wait                  - AIターン")
+                output("  examples / goal / status / quit")
             if stage_help:
                 output("")
                 output(stage_help)
+            output("")
+            return state
+
+        if cmd == "goal":
+            output(f"\n[Goal] {stage_goal}")
+            output("※ このStageでは実行されます！Stateが変わります。")
+            output("")
+            return state
+
+        if cmd == "examples":
+            output("\n=== Sample DSL ===")
+            for i, ex in enumerate(stage_examples, 1):
+                output(f"  {i}. {ex}")
+            output("\n上記をコピーして入力してみてください")
             output("")
             return state
 
@@ -383,29 +540,16 @@ def create_dsl_update(slot_path: Path, interpreter: Interpreter, meta: dict | No
 
         # DSLコマンドを実行
         try:
-            # トークン表示
-            if show_tokens:
-                tokens = tokenize(cmd)
-                output("\n[Tokens]")
-                for tok in tokens:
-                    output(f"  {tok}")
-                output("")
-
-            # AST生成
             ast = parse(cmd)
-
-            # AST表示
-            if show_ast:
-                output("\n[AST]")
-                output(f"  {ast}")
-                output("")
-
-            # 実行
             result = interpreter.execute(ast, state)
             new_state = result.state.next_turn()
 
+            # 実行結果を表示
+            output(f"\n[Execute] {cmd}")
+            output(f"  Player: ({new_state.player.pos.x}, {new_state.player.pos.y})")
+
             for error in result.errors:
-                output(f"Error: {error.message}")
+                output(f"[RuntimeError] {error.message}")
 
             if config.DEBUG:
                 for log in result.logs:
@@ -418,7 +562,8 @@ def create_dsl_update(slot_path: Path, interpreter: Interpreter, meta: dict | No
             return new_state
 
         except Exception as e:
-            output(f"Error: {e}")
+            output(f"[Error] {e}")
+            output("'help' でコマンド一覧、'examples' でサンプルを確認できます。")
             return state
 
     return update
@@ -437,16 +582,16 @@ def create_update(slot_path: Path, interpreter: Interpreter, meta: dict | None =
     if mode == "LOOP":
         return create_loop_update(slot_path, meta)
 
-    # Lexer demo mode (トークン表示 + 実行)
+    # Lexer mode (トークン表示のみ、実行しない)
     if mode == "LEXER":
-        return create_dsl_update(slot_path, interpreter, meta, show_tokens=True, show_ast=False)
+        return create_lexer_update(slot_path, meta)
 
-    # Parser demo mode (AST表示 + 実行)
+    # Parser mode (AST表示のみ、実行しない)
     if mode == "PARSER":
-        return create_dsl_update(slot_path, interpreter, meta, show_tokens=False, show_ast=True)
+        return create_parser_update(slot_path, meta)
 
-    # Interpreter mode (通常のDSL実行)
-    return create_dsl_update(slot_path, interpreter, meta, show_tokens=False, show_ast=False)
+    # Interpreter mode (フル実行)
+    return create_interpreter_update(slot_path, interpreter, meta)
 
 
 def load_meta(slot_path: Path) -> dict:
@@ -470,7 +615,11 @@ def run(slot_path: Path) -> None:
     stage_name_ja = meta.get("stage_name_ja", "")
     stage_help = meta.get("stage_help_text", "")
     stage_mode = meta.get("stage_mode", "INTERPRETER")
+    stage_goal = meta.get("stage_goal", "")
+    stage_try_first = meta.get("stage_try_first", "")
+    stage_examples = meta.get("stage_examples", [])
 
+    # ガイド画面表示
     print()
     print("=" * 50)
     print(f"  {stage_name}")
@@ -479,23 +628,58 @@ def run(slot_path: Path) -> None:
     print(f"  Mode: {stage_mode}")
     print("=" * 50)
     print(f"SAVE: {slot_path.name}")
-    if stage_help:
+
+    # Goal表示
+    if stage_goal:
         print()
-        print(stage_help)
+        print(f"Goal: {stage_goal}")
+
+    # Try First表示
+    if stage_try_first:
+        print()
+        print("Try:")
+        print(f"  {stage_try_first}")
+
+    # Examples表示（最初の3つ）
+    if stage_examples and len(stage_examples) > 1:
+        print()
+        print("Examples:")
+        for ex in stage_examples[:3]:
+            print(f"  {ex}")
+        if len(stage_examples) > 3:
+            print(f"  ... ('examples' で全て表示)")
+
+    # Commands表示
     print()
-    print("Type 'help' for commands, 'quit' to exit")
+    print("Commands:")
+    if stage_mode in ("LEXER", "PARSER"):
+        print("  <DSL>     - DSLを入力")
+        print("  examples  - サンプルDSL表示")
+        print("  goal      - このStageの目的")
+        print("  quit      - 終了")
+    else:
+        print("  help      - コマンド一覧")
+        print("  examples  - サンプル表示")
+        print("  quit      - 終了")
+
+    print()
+    print("=" * 50)
     print()
 
     # 状態読み込み
     state = load_state(slot_path)
     append_log(slot_path, "Game started")
 
-    # レンダラー作成
-    render = create_game_renderer(
-        char_mapping=config.CHAR_MAPPING,
-        show_status=True,
-        show_log=True,
-    )
+    # レンダラー作成（LEXER/PARSERモードでは簡略化）
+    if stage_mode in ("LEXER", "PARSER"):
+        # LEXER/PARSERモードではTextGridを表示しない
+        render = lambda s: ""
+    else:
+        render = create_game_renderer(
+            char_mapping=config.CHAR_MAPPING,
+            show_status=True,
+            show_log=True,
+        )
 
     # インタプリタ作成
     interpreter = Interpreter()

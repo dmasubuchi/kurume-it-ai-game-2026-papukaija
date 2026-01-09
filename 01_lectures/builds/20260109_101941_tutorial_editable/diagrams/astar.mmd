@@ -1,0 +1,13 @@
+%%{init: {'theme': 'base'}}%%
+flowchart TD
+    A[現在位置を確認] --> B[行ける場所をリストアップ]
+    B --> C[ゴールに近い場所を優先]
+    C --> D{ゴール到達?}
+    D -->|No| A
+    D -->|Yes| E[経路完成]
+
+    style A fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style B fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    style C fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    style D fill:#fff,stroke:#333,stroke-width:2px
+    style E fill:#c8e6c9,stroke:#2e7d32,stroke-width:3px

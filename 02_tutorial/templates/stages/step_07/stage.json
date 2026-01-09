@@ -5,6 +5,17 @@
   "mode": "INTERPRETER",
   "description": "Execute AST to modify game state",
   "description_ja": "ASTを実行してゲーム状態を変更する仕組みを学びます",
-  "commands": ["move player <x> <y>", "spawn <type> <x> <y>", "destroy <target>", "set <entity>.<prop> <value>", "if <cond> then <action>", "wait", "status", "help", "quit"],
-  "help_text": "move player 5 5 で座標(5,5)に移動。wait でAIターン"
+  "goal": "DSLコマンドがStateを変えることを体感する（実行される！）",
+  "commands": ["move player <x> <y>", "spawn <type> <x> <y>", "destroy <target>", "set <entity>.<prop> <value>", "wait", "status", "help", "examples", "quit"],
+  "help_text": "DSLコマンドを入力すると、実際にゲーム状態が変わります。@ が動きます！",
+  "examples": [
+    "move player 5 5",
+    "move player 10 3",
+    "spawn enemy 15 5",
+    "destroy enemy",
+    "set player.hp 50",
+    "wait"
+  ],
+  "try_first": "move player 5 5",
+  "capabilities": ["MOVE", "SPAWN", "DESTROY", "SET", "IF", "WAIT"]
 }

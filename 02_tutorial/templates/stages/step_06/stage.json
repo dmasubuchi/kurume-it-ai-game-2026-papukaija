@@ -5,6 +5,16 @@
   "mode": "PARSER",
   "description": "Parse tokens into AST",
   "description_ja": "トークンをAST（抽象構文木）に変換する仕組みを学びます",
-  "commands": ["move player <x> <y>", "spawn <type> <x> <y>", "destroy <target>", "set <entity>.<prop> <value>", "if <cond> then <action>", "status", "help", "quit"],
-  "help_text": "DSLコマンドがAST（構文木）として表示されます（AST表示後に実行）"
+  "goal": "DSLコマンドがどんなAST（構文木）になるか観察する（実行しない）",
+  "commands": ["help", "examples", "goal", "quit"],
+  "help_text": "DSLコマンドを入力すると、AST（抽象構文木）が表示されます。実行はしません。",
+  "examples": [
+    "move player 5 3",
+    "spawn enemy 10 5",
+    "destroy goblin",
+    "set player.hp 100",
+    "if player.hp < 50 then set player.state danger",
+    "if score > 100 then spawn item 5 5"
+  ],
+  "try_first": "if player.hp < 50 then set player.state danger"
 }

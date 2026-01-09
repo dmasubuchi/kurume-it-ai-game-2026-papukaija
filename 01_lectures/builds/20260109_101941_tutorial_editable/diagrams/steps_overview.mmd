@@ -1,0 +1,31 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e3f2fd'}}}%%
+flowchart TB
+    subgraph 基礎["基礎編 (Step 00-04)"]
+        S0[Step 00<br>Hello World]
+        S1[Step 01<br>Game Loop]
+        S2[Step 02<br>State]
+        S3[Step 03<br>I/O]
+        S4[Step 04<br>Renderer]
+    end
+
+    subgraph DSL["DSL編 (Step 05-07)"]
+        S5[Step 05<br>Lexer]
+        S6[Step 06<br>Parser]
+        S7[Step 07<br>Interpreter]
+    end
+
+    subgraph AI["AI編 (Step 08)"]
+        S8[Step 08<br>A* 経路探索]
+    end
+
+    基礎 --> DSL --> AI
+
+    style S0 fill:#e3f2fd,stroke:#1565c0
+    style S1 fill:#e3f2fd,stroke:#1565c0
+    style S2 fill:#e3f2fd,stroke:#1565c0
+    style S3 fill:#e3f2fd,stroke:#1565c0
+    style S4 fill:#e3f2fd,stroke:#1565c0
+    style S5 fill:#fff3e0,stroke:#ff9800
+    style S6 fill:#fff3e0,stroke:#ff9800
+    style S7 fill:#fff3e0,stroke:#ff9800
+    style S8 fill:#e8f5e9,stroke:#4caf50

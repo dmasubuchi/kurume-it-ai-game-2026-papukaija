@@ -1,0 +1,16 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e3f2fd', 'primaryTextColor': '#333', 'primaryBorderColor': '#1565c0', 'lineColor': '#1565c0'}}}%%
+flowchart LR
+    A["move player 5 3"] --> B[Lexer]
+    B --> C[トークン]
+    C --> D[Parser]
+    D --> E[AST]
+    E --> F[Interpreter]
+    F --> G[状態更新]
+
+    style A fill:#fff,stroke:#333,stroke-width:1px
+    style B fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style C fill:#fff,stroke:#333,stroke-width:1px
+    style D fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    style E fill:#fff,stroke:#333,stroke-width:1px
+    style F fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    style G fill:#fff,stroke:#333,stroke-width:1px
