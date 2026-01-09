@@ -1,0 +1,20 @@
+{
+  "id": "step_10",
+  "name": "Step 10: Enemy AI (Behavior Tree)",
+  "name_ja": "敵AI（ビヘイビアツリー）",
+  "mode": "BT",
+  "description": "Behavior Tree-based enemy AI generates MOVE commands",
+  "description_ja": "Behavior Tree（Selector/Sequence/Condition/Action）で敵AIがMOVE命令を生成する仕組みを学びます",
+  "goal": "BT（Selector/Sequence/Condition/Action）で敵AIが命令を生成することを理解する",
+  "commands": ["w/a/s/d", "wait", "toggle_ai", "bt", "status", "help", "examples", "quit"],
+  "help_text": "wait: プレイヤーを動かさずに敵AIの挙動を観察。toggle_ai: 敵AIのON/OFF。bt: BTツリー構造を表示。",
+  "examples": [
+    "wait",
+    "toggle_ai",
+    "bt",
+    "w",
+    "d"
+  ],
+  "try_first": "bt",
+  "capabilities": ["MOVE", "WAIT", "AI_DEBUG", "AI_TOGGLE"]
+}

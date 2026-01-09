@@ -1,0 +1,20 @@
+{
+  "id": "step_09",
+  "name": "Step 09: Enemy AI (FSM)",
+  "name_ja": "敵AI（有限状態機械）",
+  "mode": "FSM",
+  "description": "FSM-based enemy AI generates MOVE commands",
+  "description_ja": "FSM（有限状態機械）で敵AIがMOVE命令を生成する仕組みを学びます",
+  "goal": "FSM（状態と遷移）で敵AIが命令（MOVE）を生成することを理解する",
+  "commands": ["w/a/s/d", "wait", "toggle_ai", "ai", "status", "help", "examples", "quit"],
+  "help_text": "wait: プレイヤーを動かさずに敵AIの挙動を観察。toggle_ai: 敵AIのON/OFF。ai: FSM状態と遷移条件を表示。",
+  "examples": [
+    "wait",
+    "toggle_ai",
+    "ai",
+    "w",
+    "d"
+  ],
+  "try_first": "wait",
+  "capabilities": ["MOVE", "WAIT", "AI_DEBUG", "AI_TOGGLE"]
+}

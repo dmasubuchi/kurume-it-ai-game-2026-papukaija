@@ -1,0 +1,18 @@
+{
+  "id": "step_12",
+  "name": "Step 12: System AI (Director)",
+  "name_ja": "システムAI（ディレクター）",
+  "mode": "DIRECTOR",
+  "description": "System AI (Director) controls overall game experience",
+  "description_ja": "System AI（Director）がゲーム全体を制御する仕組みを学びます",
+  "goal": "System AI（Director）がゲーム全体を制御する仕組みを理解する",
+  "commands": ["w/a/s/d", "wait", "director", "toggle_director", "status", "help", "examples", "quit"],
+  "help_text": "wait: プレイヤーを動かさずに観察。director: 現在のTensionとルールを表示。toggle_director: DirectorのON/OFF。",
+  "examples": [
+    "wait",
+    "director",
+    "toggle_director"
+  ],
+  "try_first": "director",
+  "capabilities": ["MOVE", "WAIT", "DIRECTOR_DEBUG", "DIRECTOR_TOGGLE"]
+}

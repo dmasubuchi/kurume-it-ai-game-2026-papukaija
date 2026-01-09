@@ -1,10 +1,22 @@
 {
   "id": "step_08",
   "name": "Step 08: A* Pathfinding",
-  "name_ja": "A*経路探索（統合版）",
-  "mode": "INTERPRETER",
-  "description": "Full game with DSL interpreter and A* pathfinding AI",
-  "description_ja": "DSLコマンドとA*アルゴリズムを使った完全版ゲーム",
-  "commands": ["move player <x> <y>", "spawn <type> <x> <y>", "destroy <target>", "set <entity>.<prop> <value>", "wait", "status", "save", "help", "quit"],
-  "help_text": "move player 5 5 で座標(5,5)に移動。wait でAIターン"
+  "name_ja": "A*経路探索",
+  "mode": "PATHFINDING",
+  "description": "A* pathfinding generates MOVE commands executed by Interpreter",
+  "description_ja": "A*アルゴリズムで経路を計算し、MOVE命令列として実行します",
+  "goal": "A*で経路を計算し、MOVE命令列を生成してInterpreterで実行する",
+  "commands": ["w/a/s/d", "path <x> <y>", "goto <x> <y>", "cancel", "spawn <type> <x> <y>", "status", "help", "examples", "quit"],
+  "help_text": "goto x y はA*で経路を作り1ターン1歩移動。path x y は経路表示のみ。cancel で停止。",
+  "examples": [
+    "path 15 8",
+    "goto 15 8",
+    "goto 5 3",
+    "cancel",
+    "spawn wall 10 5",
+    "w",
+    "d"
+  ],
+  "try_first": "path 15 8",
+  "capabilities": ["MOVE", "SPAWN", "DESTROY", "PATH", "GOTO", "CANCEL"]
 }

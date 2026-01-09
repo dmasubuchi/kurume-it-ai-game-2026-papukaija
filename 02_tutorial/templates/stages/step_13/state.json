@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "player": {
+    "id": "player",
+    "name": "Player",
+    "x": 5,
+    "y": 5,
+    "hp": 100
+  },
+  "entities": [
+    {
+      "id": "enemy",
+      "name": "Enemy",
+      "x": 15,
+      "y": 5,
+      "hp": 100,
+      "is_active": true
+    },
+    {
+      "id": "goal",
+      "name": "Goal",
+      "x": 18,
+      "y": 8,
+      "hp": 100,
+      "is_active": true
+    }
+  ],
+  "turn": 0,
+  "score": 0,
+  "is_game_over": false,
+  "map_width": 20,
+  "map_height": 10
+}

@@ -1,0 +1,18 @@
+{
+  "id": "step_13",
+  "name": "Step 13: Human x AI x Rules",
+  "name_ja": "人間 x AI x ルール",
+  "mode": "INTEGRATION",
+  "description": "Understanding the separation of responsibilities between Human, AI, and Rules",
+  "description_ja": "人間・AI・ルールの責任分界を理解します",
+  "goal": "人間・AI・LLM・ルールの責任分界を理解する",
+  "commands": ["dsl <cmd>", "ai on/off", "validate", "status", "help", "examples", "quit"],
+  "help_text": "dsl <cmd>: DSLコマンドを直接実行。ai on/off: AI有効切替。validate: 直近DSLの検証結果表示。",
+  "examples": [
+    "dsl move player 1 0",
+    "ai off",
+    "validate"
+  ],
+  "try_first": "dsl move player 1 0",
+  "capabilities": ["DSL", "AI_TOGGLE", "VALIDATE"]
+}
